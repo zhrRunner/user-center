@@ -45,7 +45,7 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public Result userRegister(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
+    public User userRegister(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
         if(userLoginRequest == null) {
             return null;
         }
@@ -56,9 +56,10 @@ public class UserController {
         }
         User user = userService.userLogin(userAccount, userPassword, request);
         if(user == null) {
-            return Result.error("账户或密码不正确～请重试");
+//            return Result.error("账户或密码不正确～请重试");
+            return null;
         }
-        return Result.success(user);
+        return user;
     }
 
     @GetMapping("/search")
