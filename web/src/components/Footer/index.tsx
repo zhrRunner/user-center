@@ -1,28 +1,37 @@
 import { GithubOutlined } from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-components';
 const Footer: React.FC = () => {
-  const defaultMessage = '蚂蚁集团体验技术部出品';
+  const defaultMessage = 'zouhr的技术小屋';
   const currentYear = new Date().getFullYear();
   return (
     <DefaultFooter
       copyright={`${currentYear} ${defaultMessage}`}
       links={[
         {
-          key: 'Ant Design Pro',
-          title: 'Ant Design Pro',
-          href: 'https://pro.ant.design',
+          key: 'zouhr blog',
+          title: (
+            <>
+              <a href="https://zhr.wiki" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="https://zhr-blog.oss-cn-beijing.aliyuncs.com/blog/202311121409996.jpg"
+                  alt="icon"
+                  style={{ width: '20px', marginRight: '5px', borderRadius: '50%' }}
+                />
+                zouhr的个人博客
+              </a>
+            </>
+          ),
+          href: 'https://zhr.wiki',
           blankTarget: true,
         },
         {
           key: 'github',
-          title: <GithubOutlined />,
-          href: 'https://github.com/ant-design/ant-design-pro',
-          blankTarget: true,
-        },
-        {
-          key: 'Ant Design',
-          title: 'Ant Design',
-          href: 'https://ant.design',
+          title: (
+            <>
+              <GithubOutlined /> GitHub项目地址
+            </>
+          ),
+          href: 'https://github.com/zhrRunner/user-center',
           blankTarget: true,
         },
       ]}
