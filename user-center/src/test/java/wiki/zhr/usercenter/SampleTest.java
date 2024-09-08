@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import wiki.zhr.usercenter.mapper.UserMapper;
-import wiki.zhr.usercenter.model.User;
+import wiki.zhr.usercenter.model.domain.User;
 
 import javax.annotation.Resource;
 import java.util.List;
