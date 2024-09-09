@@ -28,7 +28,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public Result userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
+    public Long userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
         if(userRegisterRequest == null) {
             return null;
         }
@@ -39,13 +39,14 @@ public class UserController {
             return null;
         }
         long id = userService.userRegister(userAccount, userPassword, checkPassword);
-        if(id == -1) return Result.error("抱歉注册失败啦");
-        return Result.success(id);
+//        if(id == -1) return Result.error("抱歉注册失败啦");
+        if(id == -1) return null;
+        return id;
     }
 
 
     @PostMapping("/login")
-    public User userRegister(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
+    public User useLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
         if(userLoginRequest == null) {
             return null;
         }
