@@ -1,8 +1,13 @@
 package wiki.zhr.usercenter.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import wiki.zhr.usercenter.common.BaseResponse;
+import wiki.zhr.usercenter.common.ErrorCode;
+import wiki.zhr.usercenter.common.ResultUtils;
 import wiki.zhr.usercenter.constant.UserConstant;
+import wiki.zhr.usercenter.exception.BusinessException;
 import wiki.zhr.usercenter.model.domain.User;
 import wiki.zhr.usercenter.model.request.Result;
 import wiki.zhr.usercenter.model.request.UserDeleteRequest;
@@ -12,6 +17,7 @@ import wiki.zhr.usercenter.service.UserService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -20,6 +26,7 @@ import java.util.List;
  * @Author hrz
  * @Date 2024/9/7 19:51
  **/
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -63,16 +70,26 @@ public class UserController {
         return user;
     }
 
+//    @GetMapping("/search")
+//    public Result searchUsers(String username, HttpServletRequest request){
+//
+//        if(!userService.isAdmin(request)) return Result.error("您没有权限访问此接口～");
+//
+//        List<User> users = userService.searchUsers(username);
+//        if(users.isEmpty()){
+//            return Result.error("未查询到用户名为" + username + "的用户");
+//        }
+//        return Result.success(users);
+//    }
+
     @GetMapping("/search")
-    public Result searchUsers(String username, HttpServletRequest request){
-
-        if(!userService.isAdmin(request)) return Result.error("您没有权限访问此接口～");
-
-        List<User> users = userService.searchUsers(username);
-        if(users.isEmpty()){
-            return Result.error("未查询到用户名为" + username + "的用户");
+    public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
+        if (!userService.isAdmin(request)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        return Result.success(users);
+        List<User> users = userService.searchUsers(username);
+        log.info("查询到了{}个用户", users.size());
+        return ResultUtils.success(users);
     }
 
     @PostMapping("/delete")
@@ -86,6 +103,33 @@ public class UserController {
         }
         return Result.error("删除失败，此人可能已被删除～");
     }
+
+    @GetMapping("/current")
+    public User getCurrent(HttpServletRequest request){
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if(currentUser == null){
+            return null;
+        }
+        // 这里不直接从session缓存里查询而是走数据库
+        long userId = currentUser.getId();
+        // TODO 校验用户是否合法
+        User user = userService.getById(userId);
+        return userService.getSafetyUser(user);
+    }
+
+    @PostMapping("/outlogin")
+    public void outLogin(HttpServletRequest request) {
+        // 获取当前 session
+        HttpSession session = request.getSession();
+
+        // 移除 session 中的用户登录状态
+        session.removeAttribute(UserConstant.USER_LOGIN_STATE);
+
+        // 如果需要销毁整个 session，可以使用 session.invalidate()
+        // session.invalidate();
+    }
+
 
 
 }

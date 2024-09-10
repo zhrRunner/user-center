@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
                   alt="icon"
                   style={{ width: '20px', marginRight: '5px', borderRadius: '50%' }}
                 />
-                zouhr的个人博客
+                zhr&apos;s blog
               </a>
             </>
           ),

@@ -12,7 +12,7 @@ import {
 } from '@ant-design/pro-components';
 import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
-import { history, useModel } from 'umi';
+import { history, Link, useModel } from 'umi';
 import styles from './index.less';
 const LoginMessage: React.FC<{
   content: string;
@@ -47,7 +47,6 @@ const Login: React.FC = () => {
         type,
       });
       if (user) {
-        // console.log(response.code);
         const defaultLoginSuccessMessage = '登录成功！';
         message.success(defaultLoginSuccessMessage);
         await fetchUserInfo();
@@ -74,7 +73,11 @@ const Login: React.FC = () => {
         <LoginForm
           logo={<img alt="logo" src={SYSTEM_LOG} />}
           title="zouhr 的用户中心"
-          subTitle={'这是一个基于Ant Design Pro的用户中心管理系统'}
+          subTitle={
+           <>
+             <p>这是一个基于Ant Design Pro 和 SpringBoot的全栈项目</p>
+           </>
+          }
           initialValues={{
             autoLogin: true,
           }}
@@ -134,6 +137,8 @@ const Login: React.FC = () => {
             <ProFormCheckbox noStyle name="autoLogin">
               自动登录
             </ProFormCheckbox>
+
+            <Link to="/user/register" style={{ margin: '0 25px' }}>新用户注册</Link>
             <a
               href="https://zhr.wiki/"
               target="_blank"
@@ -143,8 +148,10 @@ const Login: React.FC = () => {
             >
               忘记密码请联系zhr
             </a>
+
           </div>
         </LoginForm>
+
       </div>
       <Footer />
     </div>
