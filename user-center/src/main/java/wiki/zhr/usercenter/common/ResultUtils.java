@@ -1,11 +1,10 @@
 package wiki.zhr.usercenter.common;
 
-/**
- * 返回工具类
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
- */
+/*
+ * @Author Zou hr
+ * @Description 响应的工具类
+ * @Date 16:20 2024/9/10
+ **/
 public class ResultUtils {
 
     /**
@@ -50,8 +49,6 @@ public class ResultUtils {
     public static BaseResponse error(ErrorCode errorCode, String message, String description) {
         return new BaseResponse(errorCode.getCode(), null, message, description);
     }
-
-    // https://space.bilibili.com/12890453/
 
     /**
      * 失败

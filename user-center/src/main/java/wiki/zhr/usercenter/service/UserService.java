@@ -58,5 +58,24 @@ public interface UserService extends IService<User> {
      **/
     User getSafetyUser(User originUser);
 
+    /*
+     * @Author Zou hr
+     * @Description 判断是否为管理员
+     * @Date 14:21 2024/9/10
+     * @Param [request]
+     * @return boolean
+     **/
     boolean isAdmin(HttpServletRequest request);
+    
+    /*
+     * @Author Zou hr
+     * @Description 退出登录
+     * @Date 14:21 2024/9/10
+     * @Param 
+     * @return 
+     **/
+    public Integer userLogout(HttpServletRequest request);
+
+
+    
 }

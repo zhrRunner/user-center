@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
+import wiki.zhr.usercenter.common.ErrorCode;
 import wiki.zhr.usercenter.constant.UserConstant;
+import wiki.zhr.usercenter.exception.BusinessException;
 import wiki.zhr.usercenter.model.domain.User;
 import wiki.zhr.usercenter.service.UserService;
 import wiki.zhr.usercenter.mapper.UserMapper;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,28 +45,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
         // 1. 校验
         if(StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)){
-            // TODO 修改为自定义异常
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
 
         if(userAccount.length() < 4){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号小于4位");
         }
 
         if(userPassword.length() < 8 || checkPassword.length() < 8){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码小于4位");
         }
 
         // 账户不包含特殊字符 (正则表达式)
         String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (matcher.find()) {  // 如果找到特殊字符
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号不能包含特殊字符");
         }
 
         // 密码是否和确认密码一致
         if(!userPassword.equals(checkPassword)){
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入密码不一致");
         }
 
         // 账户不能重复
@@ -71,7 +73,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.eq("userAccount", userAccount);
         long count = userMapper.selectCount(queryWrapper);
         if(count > 0) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "该账号已被注册，请重新更换账号");
         }
 
         // 2. 加密
@@ -83,7 +85,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUserPassword(encryptPassword);
         boolean saveResult = this.save(user);
         if(!saveResult){
-            return -1;
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "服务器保存数据失败");
         }
         return user.getId();
     }
@@ -92,22 +94,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         // 1. 校验用户账户
         if(StringUtils.isAnyBlank(userAccount, userPassword)){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号或密码不能为空");
         }
 
         if(userAccount.length() < 4){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号长度小于4位");
         }
 
         if(userPassword.length() < 8){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号密码小于8位");
         }
 
         // 账户不包含特殊字符 (正则表达式)
         String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
         Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
         if (matcher.find()) {  // 如果找到特殊字符
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号不能包含特殊字符");
         }
 
         // 校验密码是否输入正确
@@ -120,7 +122,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 用户不存在
         if(user == null){
             log.info("user login failed, userAccount cannot match userPassword");
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "对不起，该用户不存在或密码错误");
         }
 
         // 2. 返回用户信息(脱敏)
@@ -148,7 +150,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public boolean deleteUser(long id) {
         if(id <= 0) {
-            return false;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "该用户不存在或已被封禁");
         }
         return this.removeById(id);
     }
@@ -184,6 +186,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Integer userLogout(HttpServletRequest request) {
+        // 获取当前 session
+        HttpSession session = request.getSession();
+
+        // 移除 session 中的用户登录状态
+        session.removeAttribute(UserConstant.USER_LOGIN_STATE);
+
+        return 1;
     }
 
 

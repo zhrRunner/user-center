@@ -2,12 +2,11 @@ package wiki.zhr.usercenter.exception;
 
 import wiki.zhr.usercenter.common.ErrorCode;
 
-/**
- * 自定义异常类
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
- */
+/*
+ * @Author Zou hr
+ * @Description 自定义异常类
+ * @Date 17:09 2024/9/10
+ **/
 public class BusinessException extends RuntimeException {
 
     /**
@@ -41,8 +40,6 @@ public class BusinessException extends RuntimeException {
     public int getCode() {
         return code;
     }
-
-    // https://t.zsxq.com/0emozsIJh
 
     public String getDescription() {
         return description;

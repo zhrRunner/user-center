@@ -5,11 +5,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import wiki.zhr.usercenter.common.BaseResponse;
 import wiki.zhr.usercenter.common.ErrorCode;
+import wiki.zhr.usercenter.common.Result;
 import wiki.zhr.usercenter.common.ResultUtils;
 import wiki.zhr.usercenter.constant.UserConstant;
 import wiki.zhr.usercenter.exception.BusinessException;
 import wiki.zhr.usercenter.model.domain.User;
-import wiki.zhr.usercenter.model.request.Result;
 import wiki.zhr.usercenter.model.request.UserDeleteRequest;
 import wiki.zhr.usercenter.model.request.UserLoginRequest;
 import wiki.zhr.usercenter.model.request.UserRegisterRequest;
@@ -17,7 +17,6 @@ import wiki.zhr.usercenter.service.UserService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -35,57 +34,40 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public Long userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
         if(userRegisterRequest == null) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "服务器未接收到前端参数");
         }
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
         if(StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)){
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户账号、密码、确认密码都不能为空");
         }
         long id = userService.userRegister(userAccount, userPassword, checkPassword);
-//        if(id == -1) return Result.error("抱歉注册失败啦");
-        if(id == -1) return null;
-        return id;
+
+        return ResultUtils.success(id);
     }
 
 
     @PostMapping("/login")
-    public User useLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
+    public BaseResponse<User> useLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
         if(userLoginRequest == null) {
-            return null;
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
         if(StringUtils.isAnyBlank(userAccount, userPassword)){
-            return null;
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
         User user = userService.userLogin(userAccount, userPassword, request);
-        if(user == null) {
-//            return Result.error("账户或密码不正确～请重试");
-            return null;
-        }
-        return user;
+        return  ResultUtils.success(user);
     }
-
-//    @GetMapping("/search")
-//    public Result searchUsers(String username, HttpServletRequest request){
-//
-//        if(!userService.isAdmin(request)) return Result.error("您没有权限访问此接口～");
-//
-//        List<User> users = userService.searchUsers(username);
-//        if(users.isEmpty()){
-//            return Result.error("未查询到用户名为" + username + "的用户");
-//        }
-//        return Result.success(users);
-//    }
 
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.NO_AUTH);
         }
         List<User> users = userService.searchUsers(username);
         log.info("查询到了{}个用户", users.size());
@@ -93,41 +75,35 @@ public class UserController {
     }
 
     @PostMapping("/delete")
-    public Result deleteUser(@RequestBody UserDeleteRequest userDeleteRequest, HttpServletRequest request){
+    public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest userDeleteRequest, HttpServletRequest request){
 
-        if(!userService.isAdmin(request)) return Result.error("您没有权限访问此接口～");
+        if(!userService.isAdmin(request)) {
+            return ResultUtils.error(ErrorCode.NO_AUTH);
+        }
 
         boolean isFind = userService.deleteUser(userDeleteRequest.getId());
         if(isFind) {
-            return Result.success();
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR,"未查到该用户");
         }
-        return Result.error("删除失败，此人可能已被删除～");
+        return ResultUtils.success(isFind);
     }
 
     @GetMapping("/current")
-    public User getCurrent(HttpServletRequest request){
+    public BaseResponse<User> getCurrent(HttpServletRequest request){
         Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if(currentUser == null){
-            return null;
+            throw new BusinessException(ErrorCode.NOT_LOGIN, "当前用户未登录");
         }
         // 这里不直接从session缓存里查询而是走数据库
         long userId = currentUser.getId();
-        // TODO 校验用户是否合法
         User user = userService.getById(userId);
-        return userService.getSafetyUser(user);
+        return ResultUtils.success(userService.getSafetyUser(user));
     }
 
-    @PostMapping("/outlogin")
-    public void outLogin(HttpServletRequest request) {
-        // 获取当前 session
-        HttpSession session = request.getSession();
-
-        // 移除 session 中的用户登录状态
-        session.removeAttribute(UserConstant.USER_LOGIN_STATE);
-
-        // 如果需要销毁整个 session，可以使用 session.invalidate()
-        // session.invalidate();
+    @PostMapping("/logout")
+    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
+        return ResultUtils.success(userService.userLogout(request));
     }
 
 

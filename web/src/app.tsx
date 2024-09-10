@@ -53,6 +53,7 @@ export async function getInitialState(): Promise<{
   return {
     // @ts-ignore
     fetchUserInfo,
+    // @ts-ignore
     currentUser,
     settings: defaultSettings,
   };
@@ -64,9 +65,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
-    waterMarkProps: {
-      content: initialState?.currentUser?.username,
-    },
+    // waterMarkProps: {
+    //   content: initialState?.currentUser?.username,
+    // },
+    waterMarkProps: undefined,
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;

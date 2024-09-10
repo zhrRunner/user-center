@@ -112,11 +112,12 @@ export default () => {
       columns={columns}
       actionRef={actionRef}
       cardBordered
+      // @ts-ignore
       request={async (params = {}, sort, filter) => {
         console.log(sort, filter);
         const userList = await searchUsers();
         return {
-          data: userList.data,
+          data: userList,
         }
       }}
       editable={{

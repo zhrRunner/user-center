@@ -4,12 +4,13 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * 通用返回类
- *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://yupi.icu">编程导航知识星球</a>
- */
+/*
+ * @Author Zou hr
+ * @Description 返回通用类
+ * @Date 16:10 2024/9/10
+ * @Param
+ * @return
+ **/
 @Data
 public class BaseResponse<T> implements Serializable {
 
@@ -33,7 +34,6 @@ public class BaseResponse<T> implements Serializable {
      */
     private String description;
 
-    // https://t.zsxq.com/0emozsIJh
     public BaseResponse(int code, T data, String message, String description) {
         this.code = code;
         this.data = data;

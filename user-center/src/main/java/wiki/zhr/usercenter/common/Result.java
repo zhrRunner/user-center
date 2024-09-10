@@ -1,4 +1,4 @@
-package wiki.zhr.usercenter.model.request;
+package wiki.zhr.usercenter.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
