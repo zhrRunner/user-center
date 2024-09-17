@@ -18,6 +18,7 @@ import wiki.zhr.usercenter.service.UserService;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName UserController
@@ -74,6 +75,19 @@ public class UserController {
         return ResultUtils.success(users);
     }
 
+    @PostMapping("/reset-password")
+    public BaseResponse<Boolean> resetPassword(@RequestBody Map<String, Long> requestBody, HttpServletRequest request) {
+        // 获取 requestBody 中的 id
+        Long id = requestBody.get("id");
+
+        if (!userService.isAdmin(request)) {
+            return ResultUtils.error(ErrorCode.NO_AUTH);
+        }
+
+        boolean reset = userService.resetPassword(id);
+        return ResultUtils.success(reset);
+    }
+
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest userDeleteRequest, HttpServletRequest request){
 
@@ -82,9 +96,6 @@ public class UserController {
         }
 
         boolean isFind = userService.deleteUser(userDeleteRequest.getId());
-        if(isFind) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR,"未查到该用户");
-        }
         return ResultUtils.success(isFind);
     }
 

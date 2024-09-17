@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import { searchUsers } from "@/services/ant-design-pro/api";
-import {Image} from "antd";
+import ProTable from '@ant-design/pro-table';
+import { searchUsers, deleteById, resetPassword } from "@/services/ant-design-pro/api"; // 引入删除和重置密码的API
+import { Image, message, Popconfirm } from "antd"; // 引入 Popconfirm 和 message 进行用户确认
 
 const columns: ProColumns<API.CurrentUser>[] = [
   {
@@ -23,14 +23,15 @@ const columns: ProColumns<API.CurrentUser>[] = [
   {
     title: '头像',
     dataIndex: 'avatarUrl',
-    width: 120, // 设置列宽为 120px
+    search: false,
+    width: 120,
     render: (_, record) => (
       <div>
         <Image
           src={record.avatarUrl}
-          width={50} // 图片宽度
+          width={50}
           height={50}
-          style={{ borderRadius: '50%', objectFit: 'cover', height: '50px' }} // 保持比例
+          style={{ borderRadius: '50%', objectFit: 'cover', height: '50px' }}
         />
       </div>
     ),
@@ -40,7 +41,7 @@ const columns: ProColumns<API.CurrentUser>[] = [
     dataIndex: 'gender',
     valueEnum: {
       0: { text: '女' },
-      1: { text: '男', },
+      1: { text: '男' },
     },
   },
   {
@@ -58,7 +59,7 @@ const columns: ProColumns<API.CurrentUser>[] = [
     dataIndex: 'userStatus',
     valueEnum: {
       0: { text: '正常' },
-      1: { text: '被封禁', },
+      1: { text: '被封禁' },
     },
   },
   {
@@ -76,6 +77,7 @@ const columns: ProColumns<API.CurrentUser>[] = [
   {
     title: '创建时间',
     dataIndex: 'createTime',
+    search: false,
     valueType: 'dateTime',
   },
   {
@@ -93,14 +95,39 @@ const columns: ProColumns<API.CurrentUser>[] = [
       <a href={record.avatarUrl} target="_blank" rel="noopener noreferrer" key="view">
         查看
       </a>,
-      <TableDropdown
-        key="actionGroup"
-        onSelect={() => action?.reload()}
-        menus={[
-          { key: 'copy', name: '复制' },
-          { key: 'delete', name: '删除' },
-        ]}
-      />,
+      <Popconfirm
+        key="delete"
+        title="确定要删除这个用户吗？"
+        onConfirm={async () => {
+          const res = await deleteById({ id: record.id });
+          if (res) {
+            message.success('删除成功');
+            action?.reload(); // 删除成功后重新加载表格
+          } else {
+            message.error('删除失败');
+          }
+        }}
+        okText="确认"
+        cancelText="取消"
+      >
+        <a>删除</a>
+      </Popconfirm>,
+      <Popconfirm
+        key="resetPassword"
+        title="确定要重置该用户的密码吗？"
+        onConfirm={async () => {
+          const res = await resetPassword({ id: record.id }); // 调用 resetPassword API
+          if (res) {
+            message.success('密码重置成功');
+          } else {
+            message.error('密码重置失败');
+          }
+        }}
+        okText="确认"
+        cancelText="取消"
+      >
+        <a>重置密码</a>
+      </Popconfirm>,
     ],
   },
 ];
@@ -114,7 +141,6 @@ export default () => {
       cardBordered
       // @ts-ignore
       request={async (params = {}, sort, filter) => {
-        console.log(sort, filter);
         const userList = await searchUsers();
         return {
           data: userList,
@@ -132,7 +158,6 @@ export default () => {
         labelWidth: 'auto',
       }}
       form={{
-        // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
         syncToUrl: (values, type) => {
           if (type === 'get') {
             return {

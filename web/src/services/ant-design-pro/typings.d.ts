@@ -22,6 +22,26 @@ declare namespace API {
     currentAuthority?: string;
   };
 
+  type DeleteResult = {
+    status?: string;
+    type?: string;
+    currentAuthority?: string;
+  };
+
+  type DeleteParams = {
+    id: number;
+  };
+
+  type RestPasswordResult = {
+    status?: string;
+    type?: string;
+    currentAuthority?: string;
+  };
+
+  type RestPasswordParams = {
+    id: number;
+  };
+
   type RegisterResult = number;
 
   type PageParams = {
@@ -72,6 +92,7 @@ declare namespace API {
     autoLogin?: boolean;
     type?: string;
   };
+
 
   type RegisterParams = {
     userAccount?: string;

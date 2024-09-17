@@ -74,8 +74,15 @@ public interface UserService extends IService<User> {
      * @Param 
      * @return 
      **/
-    public Integer userLogout(HttpServletRequest request);
+     Integer userLogout(HttpServletRequest request);
 
 
-    
+    /*
+     * @Author Zou hr
+     * @Description 管理员重置用户密码
+     * @Date 16:36 2024/9/17
+     * @Param [id]
+     * @return boolean
+     **/
+    boolean resetPassword(Long id);
 }

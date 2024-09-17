@@ -42,6 +42,32 @@ export async function register(body: API.RegisterParams, options?: { [key: strin
   });
 }
 
+/** 删除用户接口 POST /api/user/delete */
+export async function deleteById(body: API.DeleteParams, options?: { [key: string]: any }) {
+  return request<API.BaseResponse<API.DeleteResult>>('/api/user/delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 重置用户密码接口 POST /api/user/reset-password */
+export async function resetPassword(body: API.RestPasswordParams, options?: { [key: string]: any }) {
+  return request<API.BaseResponse<API.RestPasswordResult>>('/api/user/reset-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+
+
 /** 搜索用户 GET /api/user/search */
 export async function searchUsers(options?: { [key: string]: any }) {
   return request<API.BaseResponse<API.CurrentUser[]>>('/api/user/search', {

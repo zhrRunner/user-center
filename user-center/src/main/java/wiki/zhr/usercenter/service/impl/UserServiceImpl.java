@@ -199,8 +199,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return 1;
     }
 
+    @Override
+    public boolean resetPassword(Long id) {
+        // 查询用户是否存在
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", id);
+        User user = userMapper.selectOne(queryWrapper);
 
+        // 如果用户不存在，返回 false
+        if (user == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "该用户不存在或已被封禁");
+        }
+
+        // 重置密码
+        String defaultPassword = "12345678";
+        // 如果需要加密密码，这里可以使用加密函数
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + defaultPassword).getBytes());
+
+        // 更新用户的密码
+        user.setUserPassword(encryptPassword);
+
+        // 更新用户信息
+        int result = userMapper.updateById(user);
+
+        // 如果更新成功，返回 true，否则返回 false
+        return result > 0;
+    }
 }
+
 
 
 
