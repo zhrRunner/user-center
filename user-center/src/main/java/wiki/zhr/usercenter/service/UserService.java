@@ -2,6 +2,7 @@ package wiki.zhr.usercenter.service;
 
 import wiki.zhr.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import wiki.zhr.usercenter.model.request.UserUpdateRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -85,4 +86,13 @@ public interface UserService extends IService<User> {
      * @return boolean
      **/
     boolean resetPassword(Long id);
+
+    /*
+     * @Author Zou hr
+     * @Description 管理员更新用户信息
+     * @Date 16:08 2024/9/18
+     * @Param [userUpdateRequest]
+     * @return wiki.zhr.usercenter.model.domain.User
+     **/
+    User updateUserInfo(UserUpdateRequest userUpdateRequest);
 }

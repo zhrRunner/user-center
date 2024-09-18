@@ -9,6 +9,7 @@ import wiki.zhr.usercenter.common.ErrorCode;
 import wiki.zhr.usercenter.constant.UserConstant;
 import wiki.zhr.usercenter.exception.BusinessException;
 import wiki.zhr.usercenter.model.domain.User;
+import wiki.zhr.usercenter.model.request.UserUpdateRequest;
 import wiki.zhr.usercenter.service.UserService;
 import wiki.zhr.usercenter.mapper.UserMapper;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -224,6 +227,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         // 如果更新成功，返回 true，否则返回 false
         return result > 0;
+    }
+
+    @Override
+    public User updateUserInfo(UserUpdateRequest userUpdateRequest) {
+
+        // 参数校验
+        if (userUpdateRequest == null || userUpdateRequest.getUserAccount() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
+        }
+
+        String userAccount = userUpdateRequest.getUserAccount();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userAccount", userAccount);
+        User user = userMapper.selectOne(queryWrapper);
+        if(user == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "该账号已被删除，请您刷新页面～");
+        }
+        user.setUserAccount(userAccount);
+        user.setUsername(userUpdateRequest.getUsername());
+        user.setAvatarUrl(userUpdateRequest.getAvatarUrl());
+        user.setGender(userUpdateRequest.getGender());
+        user.setPhone(userUpdateRequest.getPhone());
+        user.setEmail(userUpdateRequest.getEmail());
+        user.setUserStatus(userUpdateRequest.getUserStatus());
+        user.setUserRole(userUpdateRequest.getUserRole());
+        
+        boolean updateResult = this.updateById(user);
+        if(!updateResult){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "服务器保存数据失败");
+        }
+        User safetyUser = getSafetyUser(user);
+        return safetyUser;
     }
 }
 

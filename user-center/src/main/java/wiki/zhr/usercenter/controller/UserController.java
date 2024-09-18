@@ -13,6 +13,7 @@ import wiki.zhr.usercenter.model.domain.User;
 import wiki.zhr.usercenter.model.request.UserDeleteRequest;
 import wiki.zhr.usercenter.model.request.UserLoginRequest;
 import wiki.zhr.usercenter.model.request.UserRegisterRequest;
+import wiki.zhr.usercenter.model.request.UserUpdateRequest;
 import wiki.zhr.usercenter.service.UserService;
 
 import javax.annotation.Resource;
@@ -86,6 +87,17 @@ public class UserController {
 
         boolean reset = userService.resetPassword(id);
         return ResultUtils.success(reset);
+    }
+
+    @PostMapping("/update-userinfo")
+    public BaseResponse<User> updateUserInfo(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request){
+        // 暂时只有管理员可以访问，后续用户自己更改信息接口再考虑是否开放 TODO
+        if(!userService.isAdmin(request)) {
+            return ResultUtils.error(ErrorCode.NO_AUTH);
+        }
+
+        User user = userService.updateUserInfo(userUpdateRequest);
+        return ResultUtils.success(user);
     }
 
     @PostMapping("/delete")

@@ -32,15 +32,34 @@ declare namespace API {
     id: number;
   };
 
-  type RestPasswordResult = {
+  type ResetPasswordResult = {
     status?: string;
     type?: string;
     currentAuthority?: string;
   };
 
-  type RestPasswordParams = {
+  type ResetPasswordParams = {
     id: number;
   };
+
+  type updateUserInfoParams = {
+    username: string;
+    userAccount: string;
+    avatarUrl?: string;
+    gender:number;
+    phone: string;
+    email: string;
+    userStatus: number;
+    userRole: number;
+  };
+
+  type updateUserInfoResult = {
+    status?: string;
+    type?: string;
+    currentAuthority?: string;
+  };
+
+
 
   type RegisterResult = number;
 

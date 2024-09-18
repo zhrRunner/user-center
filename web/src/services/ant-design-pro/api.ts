@@ -55,8 +55,20 @@ export async function deleteById(body: API.DeleteParams, options?: { [key: strin
 }
 
 /** 重置用户密码接口 POST /api/user/reset-password */
-export async function resetPassword(body: API.RestPasswordParams, options?: { [key: string]: any }) {
-  return request<API.BaseResponse<API.RestPasswordResult>>('/api/user/reset-password', {
+export async function resetPassword(body: API.ResetPasswordParams, options?: { [key: string]: any }) {
+  return request<API.BaseResponse<API.ResetPasswordResult>>('/api/user/reset-password', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 管理员修改用户信息 POST /api/user/update-userinfo */
+export async function updateUserInfo(body: API.updateUserInfoParams, options?: { [key: string]: any }) {
+  return request<API.BaseResponse<API.updateUserInfoResult>>('/api/user/update-userinfo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

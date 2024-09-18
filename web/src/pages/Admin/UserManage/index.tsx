@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { searchUsers, deleteById, resetPassword } from "@/services/ant-design-pro/api"; // 引入删除和重置密码的API
-import { Image, message, Popconfirm } from "antd"; // 引入 Popconfirm 和 message 进行用户确认
+import { searchUsers, deleteById, resetPassword, updateUserInfo } from "@/services/ant-design-pro/api"; // 引入更新用户信息的API
+import { Image, message, Popconfirm, Modal } from "antd"; // 引入 Popconfirm 和 Modal
 
 const columns: ProColumns<API.CurrentUser>[] = [
   {
@@ -19,6 +19,7 @@ const columns: ProColumns<API.CurrentUser>[] = [
     title: '用户账户',
     dataIndex: 'userAccount',
     copyable: true,
+    editable: false,   // 设置为不可编辑
   },
   {
     title: '头像',
@@ -92,9 +93,9 @@ const columns: ProColumns<API.CurrentUser>[] = [
       >
         编辑
       </a>,
-      <a href={record.avatarUrl} target="_blank" rel="noopener noreferrer" key="view">
-        查看
-      </a>,
+      // <a href={record.avatarUrl} target="_blank" rel="noopener noreferrer" key="view">
+      //   查看
+      // </a>,  TODO 如果可以，这里开发一个view小面板，显示该用户的基本信息小卡片
       <Popconfirm
         key="delete"
         title="确定要删除这个用户吗？"
@@ -134,6 +135,40 @@ const columns: ProColumns<API.CurrentUser>[] = [
 
 export default () => {
   const actionRef = useRef<ActionType>();
+
+  const handleSave = async (key: any, record: API.CurrentUser) => {
+    Modal.confirm({
+      title: '确认保存修改？',
+      content: '是否确认保存当前修改的用户信息？',
+      onOk: async () => {
+        try {
+          // 调用更新接口
+          const res = await updateUserInfo({
+            username: record.username,
+            userAccount: record.userAccount,
+            avatarUrl: record.avatarUrl,
+            gender: record.gender,
+            phone: record.phone,
+            email: record.email,
+            userStatus: record.userStatus,
+            userRole: record.userRole,
+          });
+          if (res) {
+            message.success('用户信息更新成功');
+            actionRef.current?.reload(); // 保存后重新加载表格
+          } else {
+            message.error('用户信息更新失败');
+          }
+        } catch (error) {
+          message.error('更新失败，请重试');
+        }
+      },
+      onCancel() {
+        message.info('取消保存');
+      },
+    });
+  };
+
   return (
     <ProTable<API.CurrentUser>
       columns={columns}
@@ -148,6 +183,7 @@ export default () => {
       }}
       editable={{
         type: 'multiple',
+        onSave: handleSave, // 使用 handleSave 处理保存操作
       }}
       columnsState={{
         persistenceKey: 'pro-table-singe-demos',
