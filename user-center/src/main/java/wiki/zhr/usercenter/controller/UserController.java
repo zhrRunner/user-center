@@ -10,10 +10,7 @@ import wiki.zhr.usercenter.common.ResultUtils;
 import wiki.zhr.usercenter.constant.UserConstant;
 import wiki.zhr.usercenter.exception.BusinessException;
 import wiki.zhr.usercenter.model.domain.User;
-import wiki.zhr.usercenter.model.request.UserDeleteRequest;
-import wiki.zhr.usercenter.model.request.UserLoginRequest;
-import wiki.zhr.usercenter.model.request.UserRegisterRequest;
-import wiki.zhr.usercenter.model.request.UserUpdateRequest;
+import wiki.zhr.usercenter.model.request.*;
 import wiki.zhr.usercenter.service.UserService;
 
 import javax.annotation.Resource;
@@ -66,12 +63,12 @@ public class UserController {
         return  ResultUtils.success(user);
     }
 
-    @GetMapping("/search")
-    public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
+    @PostMapping("/search")
+    public BaseResponse<List<User>> searchUsers(@RequestBody UserSearchRequest userSearchRequest, HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
-        List<User> users = userService.searchUsers(username);
+        List<User> users = userService.searchUsers(userSearchRequest);
         log.info("查询到了{}个用户", users.size());
         return ResultUtils.success(users);
     }

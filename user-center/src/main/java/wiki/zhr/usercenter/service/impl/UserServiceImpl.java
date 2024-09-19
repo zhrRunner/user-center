@@ -9,6 +9,7 @@ import wiki.zhr.usercenter.common.ErrorCode;
 import wiki.zhr.usercenter.constant.UserConstant;
 import wiki.zhr.usercenter.exception.BusinessException;
 import wiki.zhr.usercenter.model.domain.User;
+import wiki.zhr.usercenter.model.request.UserSearchRequest;
 import wiki.zhr.usercenter.model.request.UserUpdateRequest;
 import wiki.zhr.usercenter.service.UserService;
 import wiki.zhr.usercenter.mapper.UserMapper;
@@ -138,11 +139,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public List<User> searchUsers(String username) {
+    public List<User> searchUsers(UserSearchRequest userSearchRequest) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        if(!StringUtils.isAnyBlank(username)){
-            // 判断username是否为空或者null
-            queryWrapper.like("username", username);
+
+        // 根据 UserSearchRequest 的字段进行条件查询
+        if (!StringUtils.isAnyBlank(userSearchRequest.getUsername())) {
+            queryWrapper.like("username", userSearchRequest.getUsername());
+        }
+        if (!StringUtils.isAnyBlank(userSearchRequest.getUserAccount())) {
+            queryWrapper.eq("userAccount", userSearchRequest.getUserAccount());
+        }
+        if (userSearchRequest.getGender() != null) {
+            queryWrapper.eq("gender", userSearchRequest.getGender());
+        }
+        if (!StringUtils.isAnyBlank(userSearchRequest.getPhone())) {
+            queryWrapper.eq("phone", userSearchRequest.getPhone());
+        }
+        if (!StringUtils.isAnyBlank(userSearchRequest.getEmail())) {
+            queryWrapper.eq("email", userSearchRequest.getEmail());
+        }
+        if (userSearchRequest.getUserStatus() != null) {
+            queryWrapper.eq("userStatus", userSearchRequest.getUserStatus());
+        }
+        if (userSearchRequest.getUserRole() != null) {
+            queryWrapper.eq("userRole", userSearchRequest.getUserRole());
         }
         List<User> users = this.list(queryWrapper);
 

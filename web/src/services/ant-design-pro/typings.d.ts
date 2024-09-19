@@ -16,6 +16,16 @@ declare namespace API {
     createTime: Date;
   };
 
+  type SearchUserParams = {
+    username?: string;
+    userAccount?: string;
+    gender?: number;
+    phone?: string;
+    email?: string;
+    userStatus?: number;
+    userRole?: number;
+  }
+
   type LoginResult = {
     status?: string;
     type?: string;

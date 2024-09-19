@@ -80,10 +80,14 @@ export async function updateUserInfo(body: API.updateUserInfoParams, options?: {
 
 
 
-/** 搜索用户 GET /api/user/search */
-export async function searchUsers(options?: { [key: string]: any }) {
+/** 搜索用户 POST /api/user/search */
+export async function searchUsers(body: API.SearchUserParams, options?: { [key: string]: any }) {
   return request<API.BaseResponse<API.CurrentUser[]>>('/api/user/search', {
-    method: 'GET',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }

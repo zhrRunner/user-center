@@ -2,6 +2,7 @@ package wiki.zhr.usercenter.service;
 
 import wiki.zhr.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import wiki.zhr.usercenter.model.request.UserSearchRequest;
 import wiki.zhr.usercenter.model.request.UserUpdateRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ public interface UserService extends IService<User> {
      * @Param [username]
      * @return java.util.List<wiki.zhr.usercenter.model.domain.User>
      **/
-    List<User> searchUsers(String username);
+    List<User> searchUsers(UserSearchRequest userSearchRequest);
 
     /*
      * @Author Zou hr
